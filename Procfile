@@ -1,1 +1,1 @@
-﻿web: mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs && php artisan config:clear && php artisan route:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port $PORT
+﻿web: php artisan serve --host 0.0.0.0 --port $PORT
