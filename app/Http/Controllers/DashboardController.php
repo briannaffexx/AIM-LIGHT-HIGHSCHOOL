@@ -20,6 +20,12 @@ use App\Models\PurchaseRequest;
 use App\Models\OtherIncome;
 use App\Models\StudentAccount;
 use App\Models\StudentResult;
+use App\Models\DisciplineRecord;
+use App\Models\Announcement;
+use App\Models\Subject;
+use App\Models\Timetable;
+use App\Models\Assessment;
+use App\Models\TeacherSubject;
 
 class DashboardController extends Controller
 {
@@ -50,6 +56,8 @@ class DashboardController extends Controller
                 return $this->procurementDashboard();
             case 'auditor':
                 return $this->auditorDashboard();
+            case 'parent':
+                return redirect()->route('parent.dashboard');
             default:
                 return $this->studentDashboard($user);
         }
@@ -68,7 +76,7 @@ class DashboardController extends Controller
             'total_invoiced' => Invoice::sum('amount_due'),
             'total_collected' => Payment::sum('amount'),
             'total_expenses' => Expense::sum('amount'),
-            'recent_students' => Student::latest()->take(5)->get(),
+            'recent_students' => Student::with('schoolClass')->latest()->take(5)->get(),
             'recent_staff' => Staff::with(['user', 'position', 'department'])->latest()->take(5)->get(),
         ];
         return view('dashboards.admin', $data);
@@ -77,23 +85,36 @@ class DashboardController extends Controller
     private function headTeacherDashboard()
     {
         $data = [
-            'total_students' => Student::count(),
-            'total_staff' => Staff::count(),
-            'pending_leaves' => StudentMovement::where('status', StudentMovement::STATUS_PENDING)->count(),
-            'pending_purchases' => PurchaseRequest::where('status', PurchaseRequest::STATUS_PENDING)->count(),
-            'total_invoiced' => Invoice::sum('amount_due'),
-            'total_collected' => Payment::sum('amount'),
-            'total_expenses' => Expense::sum('amount'),
-            'recent_leaves' => StudentMovement::with('student')
+            'total_students'      => Student::count(),
+            'boarding_students'   => Student::where('classification', Student::CLASSIFICATION_BOARDING)->count(),
+            'day_scholars'        => Student::where('classification', Student::CLASSIFICATION_DAY)->count(),
+            'total_staff'         => Staff::count(),
+            'total_classes'       => SchoolClass::count(),
+            'total_subjects'      => Subject::count(),
+            'total_beds'          => Bed::count(),
+            'occupied_beds'       => Bed::where('status', Bed::STATUS_OCCUPIED)->count(),
+            'pending_leaves'      => StudentMovement::where('status', StudentMovement::STATUS_PENDING)->count(),
+            'pending_purchases'   => PurchaseRequest::where('status', PurchaseRequest::STATUS_PENDING)->count(),
+            'pending_purchases_cost' => PurchaseRequest::where('status', PurchaseRequest::STATUS_PENDING)->sum('estimated_cost'),
+            'total_discipline'    => DisciplineRecord::count(),
+            'behavior_incidents'  => DisciplineRecord::where('incident_type', 'behavior')->count(),
+            'academic_incidents'  => DisciplineRecord::where('incident_type', 'academic')->count(),
+            'attendance_incidents'=> DisciplineRecord::where('incident_type', 'attendance')->count(),
+            'recent_leaves'       => StudentMovement::with(['student.schoolClass'])
                 ->where('status', StudentMovement::STATUS_PENDING)
                 ->latest()
                 ->take(5)
                 ->get(),
-            'recent_purchases' => PurchaseRequest::with('requester')
+            'recent_purchases'    => PurchaseRequest::with('requester')
                 ->where('status', PurchaseRequest::STATUS_PENDING)
                 ->latest()
                 ->take(5)
                 ->get(),
+            'recent_students'     => Student::with('schoolClass')->latest()->take(5)->get(),
+            'recent_staff'        => Staff::with(['user', 'position', 'department'])->latest()->take(5)->get(),
+            'recent_incidents'    => DisciplineRecord::with(['student.schoolClass', 'recorder.user'])->latest()->take(5)->get(),
+            'recent_announcements'=> Announcement::with('author')->latest()->take(4)->get(),
+            'classes'             => SchoolClass::withCount('students')->get(),
         ];
         return view('dashboards.head_teacher', $data);
     }
@@ -101,11 +122,68 @@ class DashboardController extends Controller
     private function teacherDashboard()
     {
         $staff = Auth::user()->staff;
+
+        $mySubjects = $staff ? $staff->teacherSubjects()
+            ->with(['subject', 'schoolClass.students', 'assessments'])
+            ->get() : collect();
+
+        $classIds = $mySubjects->pluck('class_id')->unique()->filter();
+        $mySubjectIds = $mySubjects->pluck('id')->unique()->filter();
+
+        $myStudentsCount = $classIds->isNotEmpty() 
+            ? Student::whereIn('class_id', $classIds)->count() 
+            : 0;
+
+        $recentAssessments = $mySubjectIds->isNotEmpty()
+            ? Assessment::whereIn('teacher_subject_id', $mySubjectIds)
+                ->with(['teacherSubject.subject', 'teacherSubject.schoolClass', 'term'])
+                ->latest()
+                ->take(5)
+                ->get()
+            : collect();
+
+        $totalAssessmentsCount = $mySubjectIds->isNotEmpty()
+            ? Assessment::whereIn('teacher_subject_id', $mySubjectIds)->count()
+            : 0;
+
+        $todayDayOfWeek = (int) date('N'); // 1 (Monday) to 7 (Sunday)
+        $myTimetables = $staff
+            ? Timetable::where('staff_id', $staff->id)
+                ->with(['schoolClass', 'subject'])
+                ->orderBy('day_of_week')
+                ->orderBy('start_time')
+                ->get()
+            : collect();
+
+        $timetableToday = $myTimetables->where('day_of_week', $todayDayOfWeek);
+
+        $recentAnnouncements = Announcement::whereIn('target_audience', ['all', 'teachers'])
+            ->with('author')
+            ->latest()
+            ->take(4)
+            ->get();
+
+        $recentDiscipline = $staff
+            ? DisciplineRecord::where('recorded_by', $staff->id)
+                ->with('student.schoolClass')
+                ->latest()
+                ->take(4)
+                ->get()
+            : collect();
+
         $data = [
-            'classes_count' => $staff ? $staff->teacherSubjects()->distinct('class_id')->count('class_id') : 0,
-            'subjects_count' => $staff ? $staff->teacherSubjects()->distinct('subject_id')->count('subject_id') : 0,
-            'my_subjects' => $staff ? $staff->teacherSubjects()->with(['subject', 'schoolClass'])->get() : collect(),
-            'total_students' => Student::count(),
+            'staff'                 => $staff,
+            'classes_count'         => $mySubjects->pluck('class_id')->unique()->count(),
+            'subjects_count'        => $mySubjects->pluck('subject_id')->unique()->count(),
+            'my_subjects'           => $mySubjects,
+            'my_students_count'     => $myStudentsCount,
+            'total_students'        => Student::count(),
+            'total_assessments'     => $totalAssessmentsCount,
+            'recent_assessments'    => $recentAssessments,
+            'timetable_today'       => $timetableToday,
+            'my_timetables'         => $myTimetables,
+            'recent_announcements'  => $recentAnnouncements,
+            'recent_discipline'     => $recentDiscipline,
         ];
         return view('dashboards.teacher', $data);
     }

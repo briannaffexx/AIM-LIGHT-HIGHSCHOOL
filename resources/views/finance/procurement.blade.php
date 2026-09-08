@@ -36,18 +36,25 @@
                                 <td>
                                     @if($req->status === 'approved' && in_array(Auth::user()->role->slug, ['procurement-officer', 'admin']))
                                         <!-- Quick trigger PO form -->
-                                        <button onclick="document.getElementById('po_req_id').value = '{{ $req->id }}'; document.getElementById('po_item_desc').innerText = '{{ $req->item_name }} (x{{ $req->quantity }})'; document.getElementById('po_total').value = '{{ $req->estimated_cost }}'; document.getElementById('supplier_id').focus();" class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">
-                                            Generate PO
+                                        <button onclick="document.getElementById('po_req_id').value = '{{ $req->id }}'; document.getElementById('po_item_desc').innerText = '{{ $req->item_name }} (x{{ $req->quantity }})'; document.getElementById('po_total').value = '{{ $req->estimated_cost }}'; document.getElementById('supplier_id').focus();" class="btn btn-primary btn-sm">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                            <span>Generate PO</span>
                                         </button>
                                     @elseif($req->status === 'pending' && in_array(Auth::user()->role->slug, ['head-teacher', 'admin']))
-                                        <div style="display: flex; gap: 0.25rem;">
-                                            <form action="{{ route('finance.procurement.request.approve', $req->id) }}" method="POST">
+                                        <div class="btn-group">
+                                            <form action="{{ route('finance.procurement.request.approve', $req->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">Approve</button>
+                                                <button type="submit" class="btn btn-primary btn-sm" title="Approve Request">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    <span>Approve</span>
+                                                </button>
                                             </form>
-                                            <form action="{{ route('finance.procurement.request.reject', $req->id) }}" method="POST">
+                                            <form action="{{ route('finance.procurement.request.reject', $req->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; color: var(--danger-color); border-color: rgba(239, 68, 68, 0.2);">Reject</button>
+                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.25);" title="Reject Request">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                                    <span>Reject</span>
+                                                </button>
                                             </form>
                                         </div>
                                     @else
@@ -175,7 +182,10 @@
                     <input type="number" step="0.01" name="total_amount" id="po_total" class="form-control" placeholder="0.00" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--info-color); border-color: rgba(59, 130, 246, 0.3);">Dispatch Purchase Order</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <span>Dispatch Purchase Order</span>
+                </button>
             </form>
         </div>
     </div>

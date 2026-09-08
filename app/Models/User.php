@@ -90,6 +90,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get children linked to this parent user via the parent_student pivot.
+     */
+    public function children()
+    {
+        return $this->belongsToMany(Student::class, 'parent_student', 'parent_id', 'student_id');
+    }
+
+    /**
      * Get the login history records for the user.
      */
     public function loginHistories()
@@ -103,6 +111,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFullNameAttribute(): string
     {
         return trim($this->first_name . ' ' . $this->last_name);
+    }
+
+    /**
+     * Alias accessor for name attribute.
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->full_name;
     }
 
     /**
@@ -145,6 +161,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'procurement-officer' => 'Store/Procurement Officer',
         'auditor'             => 'Auditor',
         'student'             => 'Student',
+        'parent'              => 'Parent/Guardian',
     ];
 
     /**
@@ -161,6 +178,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'Store/Procurement Officer' => 'procurement-officer',
         'Auditor'                   => 'auditor',
         'Student'                   => 'student',
+        'Parent/Guardian'           => 'parent',
     ];
 
     /**

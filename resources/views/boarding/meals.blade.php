@@ -31,7 +31,7 @@
                                 <td><strong>{{ $dayName }}</strong></td>
                                 <td>
                                     @if($bf)
-                                        <div style="font-size: 0.9rem; color: #FFFFFF; font-weight: 500;">{{ $bf->menu_item }}</div>
+                                        <div style="font-size: 0.9rem; color: var(--text-primary); font-weight: 500;">{{ $bf->menu_item }}</div>
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Time: {{ \Carbon\Carbon::parse($bf->time)->format('H:i') }}</div>
                                     @else
                                         <span style="font-size: 0.8rem; color: var(--text-secondary);">-</span>
@@ -39,7 +39,7 @@
                                 </td>
                                 <td>
                                     @if($lh)
-                                        <div style="font-size: 0.9rem; color: #FFFFFF; font-weight: 500;">{{ $lh->menu_item }}</div>
+                                        <div style="font-size: 0.9rem; color: var(--text-primary); font-weight: 500;">{{ $lh->menu_item }}</div>
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Time: {{ \Carbon\Carbon::parse($lh->time)->format('H:i') }}</div>
                                     @else
                                         <span style="font-size: 0.8rem; color: var(--text-secondary);">-</span>
@@ -47,7 +47,7 @@
                                 </td>
                                 <td>
                                     @if($dn)
-                                        <div style="font-size: 0.9rem; color: #FFFFFF; font-weight: 500;">{{ $dn->menu_item }}</div>
+                                        <div style="font-size: 0.9rem; color: var(--text-primary); font-weight: 500;">{{ $dn->menu_item }}</div>
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Time: {{ \Carbon\Carbon::parse($dn->time)->format('H:i') }}</div>
                                     @else
                                         <span style="font-size: 0.8rem; color: var(--text-secondary);">-</span>
@@ -95,7 +95,10 @@
                     <input type="time" name="time" id="time" class="form-control" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Menu Item</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    <span>Save Menu Item</span>
+                </button>
             </form>
         </div>
     </div>

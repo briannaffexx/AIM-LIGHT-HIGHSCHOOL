@@ -8,6 +8,13 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentStaffController;
+use App\Http\Controllers\DisciplineController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\CommunicationController;
+use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\ParentPortalController;
+use App\Http\Controllers\BackupController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -264,3 +271,93 @@ Route::middleware('auth')->prefix('notifications')->name('notifications.')->grou
     Route::post('/{notification}/read', [NotificationController::class, 'markRead'])->name('read');
     Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Discipline Routes (admin, head-teacher, teacher, boarding-officer, warden-matron)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,head-teacher,teacher,boarding-officer,warden-matron'])
+    ->prefix('discipline')->name('discipline.')->group(function () {
+        Route::get('/',    [DisciplineController::class, 'index'])->name('index');
+        Route::post('/',   [DisciplineController::class, 'store'])->name('store');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Library Routes (admin, head-teacher, teacher, student)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,head-teacher,teacher,student'])
+    ->prefix('library')->name('library.')->group(function () {
+        Route::get('/books',               [LibraryController::class, 'books'])->name('books');
+        Route::post('/books',              [LibraryController::class, 'storeBook'])->name('books.store');
+        Route::get('/borrows',             [LibraryController::class, 'borrows'])->name('borrows');
+        Route::post('/borrows',            [LibraryController::class, 'issueBorrow'])->name('borrows.store');
+        Route::post('/borrows/{id}/return',[LibraryController::class, 'returnBorrow'])->name('borrows.return');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Inventory / Assets Routes (admin, head-teacher, boarding-officer, procurement-officer)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,head-teacher,boarding-officer,procurement-officer'])
+    ->prefix('inventory')->name('inventory.')->group(function () {
+        Route::get('/',         [InventoryController::class, 'index'])->name('index');
+        Route::post('/',        [InventoryController::class, 'store'])->name('store');
+        Route::put('/{id}',     [InventoryController::class, 'update'])->name('update');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Timetable Routes (admin, head-teacher, teacher)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,head-teacher,teacher'])
+    ->prefix('timetable')->name('timetable.')->group(function () {
+        Route::get('/',         [TimetableController::class, 'index'])->name('index');
+        Route::post('/',        [TimetableController::class, 'store'])->name('store');
+        Route::delete('/{id}',  [TimetableController::class, 'destroy'])->name('destroy');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Communication / Announcements Routes (all authenticated users can read; staff can post)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('communication')->name('communication.')->group(function () {
+    Route::get('/announcements', [CommunicationController::class, 'announcements'])->name('announcements');
+});
+
+Route::middleware(['auth', 'role:admin,head-teacher,teacher'])
+    ->prefix('communication')->name('communication.')->group(function () {
+        Route::post('/announcements',        [CommunicationController::class, 'storeAnnouncement'])->name('announcements.store');
+        Route::delete('/announcements/{id}', [CommunicationController::class, 'deleteAnnouncement'])->name('announcements.destroy');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Parent/Guardian Portal Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:parent'])
+    ->prefix('parent')->name('parent.')->group(function () {
+        Route::get('/dashboard',         [ParentPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/child/{studentId}', [ParentPortalController::class, 'childProfile'])->name('child');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| System Backup & Disaster Recovery Routes (admin, head-teacher)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,head-teacher'])
+    ->prefix('admin/backups')->name('admin.backups.')->group(function () {
+        Route::get('/',                     [BackupController::class, 'index'])->name('index');
+        Route::post('/create',              [BackupController::class, 'create'])->name('create');
+        Route::get('/download/{filename}',  [BackupController::class, 'download'])->name('download');
+        Route::delete('/{filename}',        [BackupController::class, 'destroy'])->name('destroy');
+    });
+
+

@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', $student->full_name . ' - AIM-LIGHT High School')
 @section('page_title', 'Student Profile')
@@ -24,15 +24,27 @@
                 </div>
             </div>
         </div>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <div class="btn-group">
             @if(in_array(Auth::user()->role->slug, ['admin','head-teacher']))
-                <a href="{{ route('students.edit', $student->id) }}" class="btn btn-primary" style="font-size:0.85rem;">Edit Record</a>
+                <a href="{{ route('students.edit', $student->id) }}" class="btn btn-primary btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <span>Edit Record</span>
+                </a>
             @endif
-            <a href="{{ route('academics.report-card', $student->id) }}" class="btn btn-secondary" style="font-size:0.85rem;">Report Card</a>
+            <a href="{{ route('academics.report-card', $student->id) }}" class="btn btn-secondary btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Report Card</span>
+            </a>
             @if(in_array(Auth::user()->role->slug, ['bursar','accountant','admin']))
-                <a href="{{ route('finance.invoices', $student->id) }}" class="btn btn-secondary" style="font-size:0.85rem;">Billing</a>
+                <a href="{{ route('finance.invoices', $student->id) }}" class="btn btn-secondary btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>Billing</span>
+                </a>
             @endif
-            <a href="{{ route('students.index') }}" class="btn btn-secondary" style="font-size:0.85rem;">&#8592; Back</a>
+            <a href="{{ route('students.index') }}" class="btn btn-secondary btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>Back</span>
+            </a>
         </div>
     </div>
 
@@ -70,9 +82,9 @@
             <div class="glass-card">
                 <h4 style="font-size:1rem;font-weight:600;margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;">Fee Account</h4>
                 <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.9rem;">
-                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Invoiced</span><strong>KES {{ number_format($student->account->total_invoiced, 2) }}</strong></div>
-                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Paid</span><strong style="color:#10b981;">KES {{ number_format($student->account->total_paid, 2) }}</strong></div>
-                    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border-color);padding-top:0.5rem;"><span style="color:var(--text-secondary);">Balance Due</span><strong style="color:{{ $student->account->balance > 0 ? 'var(--danger-color)' : '#10b981' }};">KES {{ number_format($student->account->balance, 2) }}</strong></div>
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Invoiced</span><strong>MWK {{ number_format($student->account->total_invoiced, 2) }}</strong></div>
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Total Paid</span><strong style="color:#10b981;">MWK {{ number_format($student->account->total_paid, 2) }}</strong></div>
+                    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border-color);padding-top:0.5rem;"><span style="color:var(--text-secondary);">Balance Due</span><strong style="color:{{ $student->account->balance > 0 ? 'var(--danger-color)' : '#10b981' }};">MWK {{ number_format($student->account->balance, 2) }}</strong></div>
                 </div>
             </div>
             @endif

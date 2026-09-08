@@ -46,11 +46,8 @@
 
         body {
             animation: fadeInPage 1s ease;
-            cursor: none;
+            cursor: default;
             overflow-x: hidden;
-        }
-        @media (max-width: 768px) {
-            body { cursor: auto; }
         }
 
         @keyframes fadeInPage {

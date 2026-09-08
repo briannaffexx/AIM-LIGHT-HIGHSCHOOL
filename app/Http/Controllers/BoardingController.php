@@ -17,6 +17,7 @@ use App\Models\BoardingResource;
 use App\Models\Term;
 use App\Models\SystemNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BoardingController extends Controller
 {
@@ -50,51 +51,55 @@ class BoardingController extends Controller
             return redirect()->back()->withErrors(['bed_id' => 'This bed is not available.']);
         }
 
-        // Vacate current active allocation if any
-        $currentAllocation = BoardingAllocation::where('student_id', $request->student_id)
-            ->whereNull('vacated_at')
-            ->first();
-
-        if ($currentAllocation) {
-            $currentAllocation->update(['vacated_at' => now()]);
-
-            // Update old bed status if no other active allocation for that bed
-            $oldBed = $currentAllocation->bed;
-            $activeOnOldBed = BoardingAllocation::where('bed_id', $oldBed->id)
+        return DB::transaction(function () use ($request, $bed) {
+            // Vacate current active allocation if any
+            $currentAllocation = BoardingAllocation::where('student_id', $request->student_id)
                 ->whereNull('vacated_at')
-                ->exists();
-            if (!$activeOnOldBed) {
-                $oldBed->update(['status' => Bed::STATUS_AVAILABLE]);
+                ->first();
+
+            if ($currentAllocation) {
+                $currentAllocation->update(['vacated_at' => now()]);
+
+                // Update old bed status if no other active allocation for that bed
+                $oldBed = $currentAllocation->bed;
+                $activeOnOldBed = BoardingAllocation::where('bed_id', $oldBed->id)
+                    ->whereNull('vacated_at')
+                    ->exists();
+                if (!$activeOnOldBed) {
+                    $oldBed->update(['status' => Bed::STATUS_AVAILABLE]);
+                }
             }
-        }
 
-        // Create new allocation
-        BoardingAllocation::create([
-            'student_id' => $request->student_id,
-            'bed_id' => $request->bed_id,
-            'allocated_at' => now(),
-        ]);
+            // Create new allocation
+            BoardingAllocation::create([
+                'student_id' => $request->student_id,
+                'bed_id' => $request->bed_id,
+                'allocated_at' => now(),
+            ]);
 
-        $bed->update(['status' => Bed::STATUS_OCCUPIED]);
+            $bed->update(['status' => Bed::STATUS_OCCUPIED]);
 
-        return redirect()->back()->with('success', 'Student allocated to bed successfully.');
+            return redirect()->back()->with('success', 'Student allocated to bed successfully.');
+        });
     }
 
     public function vacateBed($allocationId)
     {
-        $allocation = BoardingAllocation::findOrFail($allocationId);
-        $allocation->update(['vacated_at' => now()]);
+        return DB::transaction(function () use ($allocationId) {
+            $allocation = BoardingAllocation::findOrFail($allocationId);
+            $allocation->update(['vacated_at' => now()]);
 
-        // Update bed status if no active allocation remains for that bed
-        $activeOnBed = BoardingAllocation::where('bed_id', $allocation->bed_id)
-            ->whereNull('vacated_at')
-            ->exists();
+            // Update bed status if no active allocation remains for that bed
+            $activeOnBed = BoardingAllocation::where('bed_id', $allocation->bed_id)
+                ->whereNull('vacated_at')
+                ->exists();
 
-        if (!$activeOnBed) {
-            $allocation->bed->update(['status' => Bed::STATUS_AVAILABLE]);
-        }
+            if (!$activeOnBed) {
+                $allocation->bed->update(['status' => Bed::STATUS_AVAILABLE]);
+            }
 
-        return redirect()->back()->with('success', 'Bed vacated successfully.');
+            return redirect()->back()->with('success', 'Bed vacated successfully.');
+        });
     }
 
     public function attendance(Request $request)
@@ -224,9 +229,10 @@ class BoardingController extends Controller
                 '/student/dashboard'
             );
         }
+        $approverName = Auth::user()->full_name ?? Auth::user()->name ?? 'Staff';
         SystemNotification::notifyRole('Boarding Officer', 'movement_approved',
             'Leave Approved',
-            ($student->full_name ?? 'A student') . '\'s leave has been approved by ' . Auth::user()->name . '.',
+            ($student->full_name ?? 'A student') . '\'s leave has been approved by ' . $approverName . '.',
             '/boarding/movements'
         );
 
@@ -343,21 +349,11 @@ class BoardingController extends Controller
 
     public function resources()
     {
-        $resources = BoardingResource::latest()->paginate(15);
-        return view('boarding.resources', compact('resources'));
+        return redirect()->route('inventory.index');
     }
 
     public function storeResource(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|in:bed,mattress,locker,blanket,kitchen,dining,cleaning',
-            'status' => 'required|in:available,in_use,maintenance,damaged',
-            'notes' => 'nullable|string',
-        ]);
-
-        BoardingResource::create($request->all());
-
-        return redirect()->back()->with('success', 'Boarding resource added.');
+        return redirect()->route('inventory.index');
     }
 }

@@ -17,6 +17,7 @@ use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 use App\Models\Term;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\SystemNotification;
 
@@ -64,7 +65,7 @@ class FinanceController extends Controller
             });
         }
 
-        $accounts = $query->paginate(15);
+        $accounts = $query->paginate(15)->appends($request->query());
         return view('finance.accounts', compact('accounts'));
     }
 
@@ -81,23 +82,25 @@ class FinanceController extends Controller
         $request->validate([
             'term_id' => 'required|exists:terms,id',
             'description' => 'required|string|max:255',
-            'amount_due' => 'required|numeric|min:0',
+            'amount_due' => 'required|numeric|min:0.01',
         ]);
 
-        $invoice = Invoice::create([
-            'student_id' => $studentId,
-            'term_id' => $request->term_id,
-            'description' => $request->description,
-            'amount_due' => $request->amount_due,
-            'status' => Invoice::STATUS_UNPAID,
-        ]);
+        return DB::transaction(function () use ($request, $studentId) {
+            $invoice = Invoice::create([
+                'student_id' => $studentId,
+                'term_id' => $request->term_id,
+                'description' => $request->description,
+                'amount_due' => $request->amount_due,
+                'status' => Invoice::STATUS_UNPAID,
+            ]);
 
-        // Update student account
-        $account = StudentAccount::firstOrCreate(['student_id' => $studentId]);
-        $account->increment('total_invoiced', $request->amount_due);
-        $account->increment('balance', $request->amount_due);
+            // Update student account
+            $account = StudentAccount::firstOrCreate(['student_id' => $studentId]);
+            $account->increment('total_invoiced', $request->amount_due);
+            $account->increment('balance', $request->amount_due);
 
-        return redirect()->back()->with('success', 'Invoice generated successfully.');
+            return redirect()->back()->with('success', 'Invoice generated successfully.');
+        });
     }
 
     public function storePayment(Request $request)
@@ -108,58 +111,60 @@ class FinanceController extends Controller
             'payment_method' => 'required|in:cash,bank_transfer,mobile_money',
         ]);
 
-        $invoice = Invoice::findOrFail($request->invoice_id);
-        $amountToPay = $request->amount;
+        return DB::transaction(function () use ($request) {
+            $invoice = Invoice::lockForUpdate()->findOrFail($request->invoice_id);
+            $amountToPay = (float) $request->amount;
 
-        // Check if amount exceeds what is remaining
-        $paidSoFar = $invoice->payments()->sum('amount');
-        $remaining = $invoice->amount_due - $paidSoFar;
+            // Check if amount exceeds what is remaining
+            $paidSoFar = (float) $invoice->payments()->sum('amount');
+            $remaining = (float) $invoice->amount_due - $paidSoFar;
 
-        if ($amountToPay > $remaining) {
-            return redirect()->back()->withErrors(['amount' => "Amount exceeds the remaining invoice balance of " . number_format($remaining, 2)]);
-        }
+            if ($amountToPay > ($remaining + 0.001)) {
+                return redirect()->back()->withErrors(['amount' => "Amount exceeds the remaining invoice balance of MWK " . number_format($remaining, 2)]);
+            }
 
-        // Record payment
-        $payment = Payment::create([
-            'invoice_id' => $invoice->id,
-            'student_id' => $invoice->student_id,
-            'term_id' => $invoice->term_id,
-            'fee_category_id' => null, // can be linked if invoice is associated with a category
-            'payment_reference' => 'PAY-' . strtoupper(Str::random(8)),
-            'amount' => $amountToPay,
-            'payment_date' => now(),
-            'payment_method' => $request->payment_method,
-            'recorded_by' => Auth::id(),
-        ]);
+            // Record payment
+            $payment = Payment::create([
+                'invoice_id' => $invoice->id,
+                'student_id' => $invoice->student_id,
+                'term_id' => $invoice->term_id,
+                'fee_category_id' => null,
+                'payment_reference' => 'PAY-' . strtoupper(Str::random(8)),
+                'amount' => $amountToPay,
+                'payment_date' => now(),
+                'payment_method' => $request->payment_method,
+                'recorded_by' => Auth::id(),
+            ]);
 
-        // Update invoice status
-        $newPaidTotal = $paidSoFar + $amountToPay;
-        if ($newPaidTotal >= $invoice->amount_due) {
-            $invoice->update(['status' => Invoice::STATUS_PAID]);
-        } else {
-            $invoice->update(['status' => Invoice::STATUS_PARTIALLY_PAID]);
-        }
+            // Update invoice status
+            $newPaidTotal = $paidSoFar + $amountToPay;
+            if ($newPaidTotal >= ($invoice->amount_due - 0.001)) {
+                $invoice->update(['status' => Invoice::STATUS_PAID]);
+            } else {
+                $invoice->update(['status' => Invoice::STATUS_PARTIALLY_PAID]);
+            }
 
-        // Update student account
-        $account = StudentAccount::where('student_id', $invoice->student_id)->first();
-        if ($account) {
-            $account->decrement('balance', $amountToPay);
-            $account->increment('total_paid', $amountToPay);
-        }
+            // Update student account
+            $account = StudentAccount::where('student_id', $invoice->student_id)->first();
+            if ($account) {
+                $account->decrement('balance', $amountToPay);
+                $account->increment('total_paid', $amountToPay);
+            }
 
-        // Notify student if user account exists
-        $student = $invoice->student;
-        if ($student && $student->user_id) {
-            SystemNotification::notifyUser(
-                $student->user_id,
-                'payment_received',
-                'Payment Received',
-                'A payment of KES ' . number_format($amountToPay, 2) . ' (Ref: ' . $payment->payment_reference . ') was recorded.',
-                '/finance/students/' . $student->id . '/invoices'
-            );
-        }
+            // Notify student if user account exists
+            $student = $invoice->student;
+            if ($student && $student->user_id) {
+                SystemNotification::notifyUser(
+                    $student->user_id,
+                    'payment_received',
+                    'Payment Received',
+                    'A payment of MWK ' . number_format($amountToPay, 2) . ' (Ref: ' . $payment->payment_reference . ') was recorded.',
+                    '/finance/students/' . $student->id . '/invoices'
+                );
+            }
 
-        return redirect()->back()->with('success', 'Payment recorded successfully. Ref: ' . $payment->payment_reference);
+            return redirect()->back()->with('success', 'Payment recorded successfully. Ref: ' . $payment->payment_reference);
+        });
     }
 
     public function expenses()
@@ -177,28 +182,30 @@ class FinanceController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $activeTerm = Term::where('is_active', true)->first();
+        return DB::transaction(function () use ($request) {
+            $activeTerm = Term::where('is_active', true)->first();
 
-        $expense = Expense::create([
-            'term_id' => $activeTerm ? $activeTerm->id : null,
-            'category' => $request->category,
-            'amount' => $request->amount,
-            'date' => now()->format('Y-m-d'),
-            'description' => $request->description,
-            'recorded_by' => Auth::id(),
-        ]);
+            $expense = Expense::create([
+                'term_id' => $activeTerm ? $activeTerm->id : null,
+                'category' => $request->category,
+                'amount' => $request->amount,
+                'date' => now()->format('Y-m-d'),
+                'description' => $request->description,
+                'recorded_by' => Auth::id(),
+            ]);
 
-        // Increment actual_spent in active budget if exists
-        if ($activeTerm) {
-            $budget = Budget::where('term_id', $activeTerm->id)
-                ->where('category', $request->category)
-                ->first();
-            if ($budget) {
-                $budget->increment('actual_spent', $request->amount);
+            // Increment actual_spent in active budget if exists
+            if ($activeTerm) {
+                $budget = Budget::where('term_id', $activeTerm->id)
+                    ->where('category', $request->category)
+                    ->first();
+                if ($budget) {
+                    $budget->increment('actual_spent', $request->amount);
+                }
             }
-        }
 
-        return redirect()->back()->with('success', 'Expense recorded successfully.');
+            return redirect()->back()->with('success', 'Expense recorded successfully.');
+        });
     }
 
     public function storeIncome(Request $request)
@@ -277,11 +284,12 @@ class FinanceController extends Controller
         ]);
 
         // Notify Bursar about new purchase request
+        $requesterName = Auth::user()->full_name ?? Auth::user()->name ?? 'Staff';
         SystemNotification::notifyRole(
             'Bursar',
             'purchase_request',
             'New Purchase Request',
-            'Purchase request for ' . $pr->item_name . ' (Qty: ' . $pr->quantity . ') submitted by ' . Auth::user()->name . '.',
+            'Purchase request for ' . $pr->item_name . ' (Qty: ' . $pr->quantity . ') submitted by ' . $requesterName . '.',
             '/finance/procurement'
         );
 
@@ -342,52 +350,57 @@ class FinanceController extends Controller
             'total_amount' => 'required|numeric|min:0',
         ]);
 
-        $pr = PurchaseRequest::findOrFail($request->purchase_request_id);
+        return DB::transaction(function () use ($request) {
+            $pr = PurchaseRequest::findOrFail($request->purchase_request_id);
 
-        $order = PurchaseOrder::create([
-            'purchase_request_id' => $pr->id,
-            'supplier_id' => $request->supplier_id,
-            'order_number' => 'PO-' . strtoupper(Str::random(8)),
-            'order_date' => now()->format('Y-m-d'),
-            'total_amount' => $request->total_amount,
-            'status' => PurchaseOrder::STATUS_ORDERED,
-        ]);
+            $order = PurchaseOrder::create([
+                'purchase_request_id' => $pr->id,
+                'supplier_id' => $request->supplier_id,
+                'order_number' => 'PO-' . strtoupper(Str::random(8)),
+                'order_date' => now()->format('Y-m-d'),
+                'total_amount' => $request->total_amount,
+                'status' => PurchaseOrder::STATUS_ORDERED,
+            ]);
 
-        $pr->update(['status' => PurchaseRequest::STATUS_ORDERED]);
+            $pr->update(['status' => PurchaseRequest::STATUS_ORDERED]);
 
-        return redirect()->back()->with('success', 'Purchase Order generated. Ref: ' . $order->order_number);
+            return redirect()->back()->with('success', 'Purchase Order generated. Ref: ' . $order->order_number);
+        });
     }
 
     public function updateOrderStatus($id, Request $request)
     {
         $order = PurchaseOrder::findOrFail($id);
         $request->validate(['status' => 'required|in:ordered,delivered,paid']);
-        $order->update(['status' => $request->status]);
 
-        // If paid, log it as an expense automatically
-        if ($request->status === 'paid') {
-            $activeTerm = Term::where('is_active', true)->first();
+        return DB::transaction(function () use ($request, $order) {
+            $order->update(['status' => $request->status]);
 
-            Expense::create([
-                'term_id' => $activeTerm ? $activeTerm->id : null,
-                'category' => 'boarding_supplies', // default classification for POs
-                'amount' => $order->total_amount,
-                'date' => now()->format('Y-m-d'),
-                'description' => "Paid Purchase Order {$order->order_number} for: " . $order->purchaseRequest->item_name,
-                'recorded_by' => Auth::id(),
-            ]);
+            // If paid, log it as an expense automatically
+            if ($request->status === 'paid') {
+                $activeTerm = Term::where('is_active', true)->first();
 
-            // Increment budget spent
-            if ($activeTerm) {
-                $budget = Budget::where('term_id', $activeTerm->id)
-                    ->where('category', 'boarding_supplies')
-                    ->first();
-                if ($budget) {
-                    $budget->increment('actual_spent', $order->total_amount);
+                Expense::create([
+                    'term_id' => $activeTerm ? $activeTerm->id : null,
+                    'category' => 'boarding_supplies', // default classification for POs
+                    'amount' => $order->total_amount,
+                    'date' => now()->format('Y-m-d'),
+                    'description' => "Paid Purchase Order {$order->order_number} for: " . ($order->purchaseRequest->item_name ?? 'Supplies'),
+                    'recorded_by' => Auth::id(),
+                ]);
+
+                // Increment budget spent
+                if ($activeTerm) {
+                    $budget = Budget::where('term_id', $activeTerm->id)
+                        ->where('category', 'boarding_supplies')
+                        ->first();
+                    if ($budget) {
+                        $budget->increment('actual_spent', $order->total_amount);
+                    }
                 }
             }
-        }
 
-        return redirect()->back()->with('success', 'Order status updated.');
+            return redirect()->back()->with('success', 'Order status updated.');
+        });
     }
 }

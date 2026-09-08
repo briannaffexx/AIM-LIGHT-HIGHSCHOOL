@@ -29,8 +29,8 @@
                                 </td>
                                 <td><strong>{{ $struct->category->name }}</strong></td>
                                 <td>{{ $struct->term->name }} ({{ $struct->term->academicYear->name }})</td>
-                                <td style="text-align: right; font-weight: 700; color: #FFFFFF;">
-                                    {{ number_format($struct->amount, 2) }}
+                                <td style="text-align: right; font-weight: 700; color: var(--text-primary);">
+                                    MWK {{ number_format($struct->amount, 2) }}
                                 </td>
                             </tr>
                         @empty
@@ -81,7 +81,10 @@
                     <input type="number" step="0.01" name="amount" id="amount" class="form-control" placeholder="0.00" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Levy Settings</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    <span>Save Levy Settings</span>
+                </button>
             </form>
         </div>
     </div>

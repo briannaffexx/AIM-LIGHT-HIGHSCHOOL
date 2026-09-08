@@ -79,7 +79,10 @@
                     <textarea name="description" id="description" class="form-control" rows="3" placeholder="Briefly explain the expenditure..." required></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--danger-color); border-color: rgba(239, 68, 68, 0.3);">Submit Expenditure</button>
+                <button type="submit" class="btn btn-danger" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/></svg>
+                    <span>Submit Expenditure</span>
+                </button>
             </form>
         </div>
     </div>
@@ -156,7 +159,10 @@
                     <textarea name="description" id="income_description" class="form-control" rows="2" placeholder="Notes concerning this funding..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--success-color); border-color: rgba(16, 185, 129, 0.3);">Submit Income</button>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <span>Submit Income</span>
+                </button>
             </form>
         </div>
     </div>

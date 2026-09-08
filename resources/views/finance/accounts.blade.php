@@ -15,10 +15,18 @@
                 <label for="search" class="form-label">Search Student Name or ADM</label>
                 <input type="text" name="search" id="search" class="form-control" placeholder="Search..." value="{{ request('search') }}">
             </div>
-            <button type="submit" class="btn btn-secondary">Filter</button>
-            @if(request('search'))
-                <a href="{{ route('finance.accounts') }}" class="btn btn-secondary" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.2);">Clear</a>
-            @endif
+            <div style="display:flex; gap:0.5rem;">
+                <button type="submit" class="btn btn-secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    <span>Filter</span>
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('finance.accounts') }}" class="btn btn-secondary" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.25);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span>Clear</span>
+                    </a>
+                @endif
+            </div>
         </form>
 
         <div class="table-container">
@@ -42,20 +50,21 @@
                             <td><strong>{{ $acc->student->full_name }}</strong></td>
                             <td>{{ $acc->student->schoolClass->name ?? 'N/A' }}</td>
                             <td>
-                                <span class="pill {{ $acc->student->classification == 'boarding' ? 'pill-success' : 'pill-info' }}">
+                                <span class="pill {{ $acc->student->classification == 'boarding' ? 'pill-info' : 'pill-success' }}">
                                     {{ str_replace('_', ' ', $acc->student->classification) }}
                                 </span>
                             </td>
-                            <td style="text-align: right;">{{ number_format($acc->total_invoiced, 2) }}</td>
+                            <td style="text-align: right;">MWK {{ number_format($acc->total_invoiced, 2) }}</td>
                             <td style="text-align: right; color: var(--success-color); font-weight: 500;">
-                                {{ number_format($acc->total_paid, 2) }}
+                                MWK {{ number_format($acc->total_paid, 2) }}
                             </td>
                             <td style="text-align: right; @if($acc->balance > 0) color: var(--danger-color); font-weight: 700; @else color: var(--success-color); @endif">
-                                {{ number_format($acc->balance, 2) }}
+                                MWK {{ number_format($acc->balance, 2) }}
                             </td>
                             <td style="text-align: center;">
-                                <a href="{{ route('finance.invoices', $acc->student_id) }}" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-                                    View Statements
+                                <a href="{{ route('finance.invoices', $acc->student_id) }}" class="btn btn-primary btn-sm">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                    <span>Statement</span>
                                 </a>
                             </td>
                         </tr>

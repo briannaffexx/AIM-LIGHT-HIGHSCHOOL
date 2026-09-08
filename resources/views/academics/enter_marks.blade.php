@@ -14,7 +14,10 @@
                     Subject: {{ $assessment->teacherSubject->subject->name }} | Class: {{ $assessment->teacherSubject->schoolClass->name }} | Term: {{ $assessment->term->name }}
                 </p>
             </div>
-            <a href="{{ route('academics.assessments', $assessment->teacher_subject_id) }}" class="btn btn-secondary" style="padding: 0.45rem 1rem; font-size: 0.8rem;">Back</a>
+            <a href="{{ route('academics.assessments', $assessment->teacher_subject_id) }}" class="btn btn-secondary btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>Back to Assessments</span>
+            </a>
         </div>
 
         <form action="{{ route('academics.marks.store', $assessment->id) }}" method="POST">
@@ -55,9 +58,15 @@
                 </table>
             </div>
 
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <a href="{{ route('academics.assessments', $assessment->teacher_subject_id) }}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Grades</button>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <a href="{{ route('academics.assessments', $assessment->teacher_subject_id) }}" class="btn btn-secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <span>Cancel</span>
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    <span>Save Grades</span>
+                </button>
             </div>
         </form>
     </div>

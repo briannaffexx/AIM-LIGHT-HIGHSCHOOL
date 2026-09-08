@@ -6,6 +6,18 @@
 @endsection
 
 @section('content')
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">
+                Academics &nbsp;/&nbsp; {{ $teacherSubject->subject->name }} &nbsp;/&nbsp; {{ $teacherSubject->schoolClass->name }}
+            </span>
+        </div>
+        <a href="{{ route('academics.teacher-subjects') }}" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Subjects</span>
+        </a>
+    </div>
+
     <div class="dashboard-row" style="grid-template-columns: 2fr 1fr;">
         <!-- Assessments List -->
         <div class="glass-card">
@@ -30,8 +42,9 @@
                                 <td>{{ $ass->max_marks }}</td>
                                 <td>{{ $ass->weight }}%</td>
                                 <td>
-                                    <a href="{{ route('academics.marks', $ass->id) }}" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-                                        Record Grades
+                                    <a href="{{ route('academics.marks', $ass->id) }}" class="btn btn-primary btn-sm">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                        <span>Record Grades</span>
                                     </a>
                                 </td>
                             </tr>
@@ -77,7 +90,10 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Assessment</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Create Assessment</span>
+                </button>
             </form>
         </div>
     </div>

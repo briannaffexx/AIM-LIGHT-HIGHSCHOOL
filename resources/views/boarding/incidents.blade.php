@@ -30,7 +30,7 @@
                                     </span>
                                 </td>
                                 <td><span style="font-size: 0.85rem;">{{ $inc->details }}</span></td>
-                                <td><span style="font-size: 0.85rem; color: #FFFFFF;">{{ $inc->follow_up_actions ?? '-' }}</span></td>
+                                <td><span style="font-size: 0.85rem; color: var(--text-primary);">{{ $inc->follow_up_actions ?? '-' }}</span></td>
                                 <td>{{ $inc->reporter->user->name ?? 'N/A' }}<br><small style="color: var(--text-secondary);">{{ $inc->reported_at->format('Y-m-d') }}</small></td>
                             </tr>
                         @empty
@@ -84,7 +84,10 @@
                     <textarea name="follow_up_actions" id="follow_up_actions" class="form-control" rows="2" placeholder="e.g. parents called, suspended, warnings..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Record Incident File</button>
+                <button type="submit" class="btn btn-danger" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>Record Incident File</span>
+                </button>
             </form>
         </div>
     </div>

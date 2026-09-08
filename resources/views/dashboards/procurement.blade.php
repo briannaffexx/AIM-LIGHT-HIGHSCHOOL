@@ -4,31 +4,26 @@
 @section('page_title', 'Procurement & Inventory Officer Panel')
 
 @section('content')
-    <div class="card-grid">
-        <div class="glass-card">
+    <div class="dashboard-row" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:1.75rem;">
+        <div class="metric-card" style="border-left:4px solid #6366f1;">
             <div class="metric-title">Total Requests</div>
             <div class="metric-value">{{ $total_requests }}</div>
-            <div class="metric-indicator text-secondary">Logged supply requests</div>
+            <div class="metric-sub">Logged supply requests</div>
         </div>
-
-        <div class="glass-card">
+        <div class="metric-card" style="border-left:4px solid {{ $pending_requests > 0 ? '#f59e0b' : '#10b981' }};">
             <div class="metric-title">Pending Authorizations</div>
-            <div class="metric-value">{{ $pending_requests }}</div>
-            <div class="metric-indicator {{ $pending_requests > 0 ? 'indicator-down' : 'indicator-up' }}">
-                Awaiting head teacher review
-            </div>
+            <div class="metric-value" style="color:{{ $pending_requests > 0 ? 'var(--warning-color)' : 'var(--success-color)' }};">{{ $pending_requests }}</div>
+            <div class="metric-sub">Awaiting head teacher review</div>
         </div>
-
-        <div class="glass-card">
+        <div class="metric-card" style="border-left:4px solid #10b981;">
             <div class="metric-title">Approved Purchases</div>
-            <div class="metric-value">{{ $approved_requests }}</div>
-            <div class="metric-indicator text-secondary">Ready to be ordered</div>
+            <div class="metric-value" style="color:var(--success-color);">{{ $approved_requests }}</div>
+            <div class="metric-sub">Ready to be ordered</div>
         </div>
-
-        <div class="glass-card">
+        <div class="metric-card" style="border-left:4px solid #22d3ee;">
             <div class="metric-title">Active Orders (POs)</div>
             <div class="metric-value">{{ $ordered_requests }}</div>
-            <div class="metric-indicator text-secondary">Awaiting delivery</div>
+            <div class="metric-sub">Awaiting delivery</div>
         </div>
     </div>
 

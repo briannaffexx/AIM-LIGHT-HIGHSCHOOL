@@ -4,13 +4,22 @@
 @section('page_title', 'Student Academic Performance Report')
 
 @section('content')
+    <div style="max-width: 800px; margin: 0 auto 1.25rem auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ route('students.index') }}" class="btn btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Students</span>
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Print Report Card</span>
+        </button>
+    </div>
+
     <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
         <!-- Header Info -->
         <div style="text-align: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
-            <div class="logo-icon" style="margin: 0 auto 0.75rem auto; width: 45px; height: 45px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
-            </div>
-            <h2 style="font-size: 1.35rem; font-weight: 700;">OFFICIAL STUDENT ACADEMIC PROGRESS CARD</h2>
+            <div class="sb-brand-icon" style="margin: 0 auto 0.75rem auto; width: 45px; height: 45px; font-size:1.2rem;">A</div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color:var(--text-primary);">OFFICIAL STUDENT ACADEMIC PROGRESS CARD</h2>
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
                 Academic Year: {{ $activeYear->name ?? '2025/2026' }}
             </p>
@@ -29,7 +38,7 @@
         </div>
 
         <!-- Performance Comparison Table -->
-        <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; color: #FFFFFF; display: flex; align-items: center; gap: 0.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2.5"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
             Term-by-Term Comparative Performance Analysis
         </h3>
@@ -53,7 +62,7 @@
                                     @php
                                         $scoreVal = $scores[$term->name] ?? '-';
                                     @endphp
-                                    <span style="font-weight: 600; @if(str_contains($scoreVal, '%')) color: #FFFFFF; @else color: var(--text-secondary); @endif">
+                                    <span style="font-weight: 600; @if(str_contains($scoreVal, '%')) color: var(--text-primary); @else color: var(--text-secondary); @endif">
                                         {{ $scoreVal }}
                                     </span>
                                 </td>

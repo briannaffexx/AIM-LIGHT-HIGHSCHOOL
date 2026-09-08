@@ -58,6 +58,11 @@ class Student extends Model
         return $this->hasOne(BoardingAllocation::class)->whereNull('vacated_at');
     }
 
+    public function boardingAllocation()
+    {
+        return $this->activeAllocation();
+    }
+
     public function attendance()
     {
         return $this->hasMany(BoardingAttendance::class);
@@ -86,6 +91,21 @@ class Student extends Model
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function disciplineRecords()
+    {
+        return $this->hasMany(DisciplineRecord::class);
+    }
+
+    public function libraryBorrows()
+    {
+        return $this->hasMany(LibraryBorrow::class);
+    }
+
+    public function parents()
+    {
+        return $this->belongsToMany(User::class, 'parent_student', 'student_id', 'parent_id');
     }
 
     /**

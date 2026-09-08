@@ -21,7 +21,10 @@
                         <option value="evening" {{ $type == 'evening' ? 'selected' : '' }}>Evening (09:00 PM)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-secondary" style="padding: 0.55rem 1rem;">Load</button>
+                <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.55rem 1rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    <span>Load</span>
+                </button>
             </form>
         </div>
 
@@ -87,7 +90,10 @@
 
             @if($students->isNotEmpty())
                 <div style="display: flex; justify-content: flex-end;">
-                    <button type="submit" class="btn btn-primary">Submit Roll Call</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>Submit Roll Call</span>
+                    </button>
                 </div>
             @endif
         </form>

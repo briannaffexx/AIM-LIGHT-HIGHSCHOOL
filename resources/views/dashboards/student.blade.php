@@ -12,17 +12,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
                 <div>
                     <label class="form-label" style="font-weight: 600;">Admission Number</label>
-                    <div style="font-size: 1.1rem; color: #FFFFFF; font-weight: 700; margin-bottom: 1rem;">{{ $student->admission_number }}</div>
+                    <div style="font-size: 1.1rem; color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">{{ $student->admission_number }}</div>
 
                     <label class="form-label" style="font-weight: 600;">Full Name</label>
-                    <div style="font-size: 1rem; color: #FFFFFF; margin-bottom: 1rem;">{{ $student->full_name }}</div>
+                    <div style="font-size: 1rem; color: var(--text-primary); margin-bottom: 1rem;">{{ $student->full_name }}</div>
 
                     <label class="form-label" style="font-weight: 600;">Class / Form</label>
-                    <div style="font-size: 1rem; color: #FFFFFF; margin-bottom: 1rem;">{{ $student->schoolClass->name ?? 'N/A' }}</div>
+                    <div style="font-size: 1rem; color: var(--text-primary); margin-bottom: 1rem;">{{ $student->schoolClass->name ?? 'N/A' }}</div>
                 </div>
                 <div>
                     <label class="form-label" style="font-weight: 600;">Classification</label>
-                    <div style="font-size: 1rem; color: #FFFFFF; margin-bottom: 1rem;">
+                    <div style="font-size: 1rem; color: var(--text-primary); margin-bottom: 1rem;">
                         <span class="pill {{ $student->classification == 'boarding' ? 'pill-success' : 'pill-info' }}">
                             {{ str_replace('_', ' ', $student->classification) }}
                         </span>
@@ -45,19 +45,19 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
                             <div>
                                 <label class="form-label">House</label>
-                                <div style="color: #FFFFFF;">{{ $allocation->bed->room->dormitory->house->name }}</div>
+                                <div style="color: var(--text-primary);">{{ $allocation->bed->room->dormitory->house->name }}</div>
                             </div>
                             <div>
                                 <label class="form-label">Dormitory</label>
-                                <div style="color: #FFFFFF;">{{ $allocation->bed->room->dormitory->name }}</div>
+                                <div style="color: var(--text-primary);">{{ $allocation->bed->room->dormitory->name }}</div>
                             </div>
                             <div>
                                 <label class="form-label">Room</label>
-                                <div style="color: #FFFFFF;">{{ $allocation->bed->room->name }}</div>
+                                <div style="color: var(--text-primary);">{{ $allocation->bed->room->name }}</div>
                             </div>
                             <div>
                                 <label class="form-label">Bed Number</label>
-                                <div style="color: #FFFFFF; font-weight: 600;">{{ $allocation->bed->bed_number }}</div>
+                                <div style="color: var(--text-primary); font-weight: 600;">{{ $allocation->bed->bed_number }}</div>
                             </div>
                         </div>
                     @else
@@ -203,3 +203,4 @@
         @endif
     </div>
 @endsection
+

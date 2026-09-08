@@ -27,6 +27,7 @@ class LoginController extends Controller
         'procurement-officer' => 'procurement.dashboard',
         'auditor'             => 'auditor.dashboard',
         'student'             => 'student.dashboard',
+        'parent'              => 'parent.dashboard',
     ];
 
     public function showLogin()

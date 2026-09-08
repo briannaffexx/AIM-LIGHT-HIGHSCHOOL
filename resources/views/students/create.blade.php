@@ -45,7 +45,7 @@
                 <div class="form-group">
                     <label for="classification" class="form-label">Boarding Classification *</label>
                     <select name="classification" id="classification" class="form-control" required>
-                        <option value="day_scholar" {{ old('classification') == 'day_scholar' ? 'selected' : '' }}>Day Scholar</option>
+                        <option value="day" {{ old('classification', 'day') == 'day' ? 'selected' : '' }}>Day Scholar</option>
                         <option value="boarding" {{ old('classification') == 'boarding' ? 'selected' : '' }}>Boarding Student</option>
                     </select>
                 </div>
@@ -70,8 +70,14 @@
             </div>
 
             <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <a href="{{ route('students.index') }}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Admit Student</button>
+                <a href="{{ route('students.index') }}" class="btn btn-secondary">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <span>Cancel</span>
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+                    <span>Admit Student</span>
+                </button>
             </div>
         </form>
     </div>

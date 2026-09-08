@@ -44,21 +44,30 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div style="display: flex; gap: 0.25rem;">
+                                    <div class="btn-group">
                                         @if($mvt->status == 'pending')
-                                            <form action="{{ route('boarding.movements.approve', $mvt->id) }}" method="POST">
+                                            <form action="{{ route('boarding.movements.approve', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-primary" style="padding: 0.35rem 0.5rem; font-size: 0.7rem;">Approve</button>
+                                                <button type="submit" class="btn btn-primary btn-sm" title="Approve Leave">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    <span>Approve</span>
+                                                </button>
                                             </form>
                                         @elseif($mvt->status == 'approved')
-                                            <form action="{{ route('boarding.movements.depart', $mvt->id) }}" method="POST">
+                                            <form action="{{ route('boarding.movements.depart', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; color: var(--info-color); border-color: rgba(59, 130, 246, 0.2);">Depart</button>
+                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--info-color); border-color: rgba(6, 182, 212, 0.3);" title="Mark Departed">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                                    <span>Depart</span>
+                                                </button>
                                             </form>
                                         @elseif($mvt->status == 'departed')
-                                            <form action="{{ route('boarding.movements.return', $mvt->id) }}" method="POST">
+                                            <form action="{{ route('boarding.movements.return', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; color: var(--success-color); border-color: rgba(16, 185, 129, 0.2);">Return</button>
+                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--success-color); border-color: rgba(16, 185, 129, 0.3);" title="Mark Returned">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                                    <span>Return</span>
+                                                </button>
                                             </form>
                                         @endif
                                     </div>
@@ -114,7 +123,10 @@
                     <input type="datetime-local" name="expected_return_date" id="expected_return_date" class="form-control" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Record Request</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    <span>Record Request</span>
+                </button>
             </form>
         </div>
     </div>

@@ -11,6 +11,7 @@ use App\Models\SchoolClass;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\StudentHistory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -35,7 +36,7 @@ class StudentStaffController extends Controller
             });
         }
 
-        $students = $query->paginate(15);
+        $students = $query->latest()->paginate(15)->appends($request->query());
         $classes = SchoolClass::all();
 
         return view('students.index', compact('students', 'classes'));
@@ -61,47 +62,49 @@ class StudentStaffController extends Controller
             'guardian_email' => 'nullable|email|max:255',
         ]);
 
-        // Create User
-        $user = User::create([
-            'uuid' => (string) Str::uuid(),
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make('password'), // default password
-            'status' => User::STATUS_ACTIVE,
-        ]);
+        return DB::transaction(function () use ($request) {
+            // Create User
+            $user = User::create([
+                'uuid' => (string) Str::uuid(),
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make('password'), // default password
+                'status' => User::STATUS_ACTIVE,
+            ]);
 
-        // Assign student role using Spatie
-        $user->assignRole('student');
+            // Assign student role using Spatie
+            $user->assignRole('Student');
 
-        // Create Student
-        $student = Student::create([
-            'user_id' => $user->id,
-            'admission_number' => $request->admission_number,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'class_id' => $request->class_id,
-            'classification' => $request->classification,
-            'status' => Student::STATUS_ACTIVE,
-            'guardian_name' => $request->guardian_name,
-            'guardian_phone' => $request->guardian_phone,
-            'guardian_email' => $request->guardian_email,
-        ]);
+            // Create Student
+            $student = Student::create([
+                'user_id' => $user->id,
+                'admission_number' => $request->admission_number,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'class_id' => $request->class_id,
+                'classification' => $request->classification,
+                'status' => Student::STATUS_ACTIVE,
+                'guardian_name' => $request->guardian_name,
+                'guardian_phone' => $request->guardian_phone,
+                'guardian_email' => $request->guardian_email,
+            ]);
 
-        // Student Account setup automatically
-        $student->account()->create([
-            'balance' => 0,
-            'total_invoiced' => 0,
-            'total_paid' => 0,
-        ]);
+            // Student Account setup automatically
+            $student->account()->create([
+                'balance' => 0,
+                'total_invoiced' => 0,
+                'total_paid' => 0,
+            ]);
 
-        StudentHistory::create([
-            'student_id' => $student->id,
-            'action' => 'Admission',
-            'details' => 'Student admitted to ' . $student->schoolClass->name . ' as ' . str_replace('_', ' ', $student->classification),
-        ]);
+            StudentHistory::create([
+                'student_id' => $student->id,
+                'action' => 'Admission',
+                'details' => 'Student admitted to ' . ($student->schoolClass->name ?? 'Class') . ' as ' . str_replace('_', ' ', $student->classification),
+            ]);
 
-        return redirect()->route('students.index')->with('success', 'Student registered successfully.');
+            return redirect()->route('students.index')->with('success', 'Student registered successfully.');
+        });
     }
 
     public function staff(Request $request)
@@ -122,7 +125,7 @@ class StudentStaffController extends Controller
             });
         }
 
-        $staff = $query->paginate(15);
+        $staff = $query->latest()->paginate(15)->appends($request->query());
         $departments = Department::all();
 
         return view('staff.index', compact('staff', 'departments'));
@@ -149,30 +152,32 @@ class StudentStaffController extends Controller
             'department_id' => 'required|exists:departments,id',
         ]);
 
-        $user = User::create([
-            'uuid' => (string) Str::uuid(),
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make('password'), // default password
-            'status' => User::STATUS_ACTIVE,
-        ]);
+        return DB::transaction(function () use ($request) {
+            $user = User::create([
+                'uuid' => (string) Str::uuid(),
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make('password'), // default password
+                'status' => User::STATUS_ACTIVE,
+            ]);
 
-        // Assign role using Spatie
-        $role = Role::findOrFail($request->role_id);
-        $user->assignRole($role->name);
+            // Assign role using Spatie
+            $role = Role::findOrFail($request->role_id);
+            $user->assignRole($role->name);
 
-        Staff::create([
-            'user_id' => $user->id,
-            'staff_number' => $request->staff_number,
-            'position_id' => $request->position_id,
-            'department_id' => $request->department_id,
-            'employment_status' => Staff::STATUS_FULL_TIME,
-            'attendance_status' => 'present',
-        ]);
+            Staff::create([
+                'user_id' => $user->id,
+                'staff_number' => $request->staff_number,
+                'position_id' => $request->position_id,
+                'department_id' => $request->department_id,
+                'employment_status' => Staff::STATUS_FULL_TIME,
+                'attendance_status' => 'present',
+            ]);
 
-        return redirect()->route('staff.index')->with('success', 'Staff registered successfully.');
+            return redirect()->route('staff.index')->with('success', 'Staff registered successfully.');
+        });
     }
 
     // ── Student Show ──────────────────────────────────────────────────────────
@@ -212,46 +217,51 @@ class StudentStaffController extends Controller
             'guardian_email' => 'nullable|email|max:255',
         ]);
 
-        $student->user->update([
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'email'      => $request->email,
-        ]);
-
-        if ($student->class_id != $request->class_id) {
-            $newClass = SchoolClass::find($request->class_id);
-            StudentHistory::create([
-                'student_id' => $student->id,
-                'action'     => 'Class Change',
-                'details'    => 'Moved from ' . ($student->schoolClass->name ?? 'N/A') . ' to ' . ($newClass->name ?? 'N/A'),
+        return DB::transaction(function () use ($request, $student) {
+            $student->user->update([
+                'first_name' => $request->first_name,
+                'last_name'  => $request->last_name,
+                'email'      => $request->email,
             ]);
-        }
 
-        $student->update([
-            'first_name'      => $request->first_name,
-            'last_name'       => $request->last_name,
-            'class_id'        => $request->class_id,
-            'classification'  => $request->classification,
-            'status'          => $request->status,
-            'guardian_name'   => $request->guardian_name,
-            'guardian_phone'  => $request->guardian_phone,
-            'guardian_email'  => $request->guardian_email,
-        ]);
+            if ($student->class_id != $request->class_id) {
+                $newClass = SchoolClass::find($request->class_id);
+                StudentHistory::create([
+                    'student_id' => $student->id,
+                    'action'     => 'Class Change',
+                    'details'    => 'Moved from ' . ($student->schoolClass->name ?? 'N/A') . ' to ' . ($newClass->name ?? 'N/A'),
+                ]);
+            }
 
-        return redirect()->route('students.show', $student->id)->with('success', 'Student record updated successfully.');
+            $student->update([
+                'first_name'      => $request->first_name,
+                'last_name'       => $request->last_name,
+                'class_id'        => $request->class_id,
+                'classification'  => $request->classification,
+                'status'          => $request->status,
+                'guardian_name'   => $request->guardian_name,
+                'guardian_phone'  => $request->guardian_phone,
+                'guardian_email'  => $request->guardian_email,
+            ]);
+
+            return redirect()->route('students.show', $student->id)->with('success', 'Student record updated successfully.');
+        });
     }
 
     // ── Student Destroy ───────────────────────────────────────────────────────
     public function destroyStudent(Student $student)
     {
-        StudentHistory::create([
-            'student_id' => $student->id,
-            'action'     => 'Record Deleted',
-            'details'    => 'Student record removed by ' . auth()->user()->name,
-        ]);
-        $student->user->delete();
-        $student->delete();
-        return redirect()->route('students.index')->with('success', 'Student record deleted.');
+        return DB::transaction(function () use ($student) {
+            $deleter = auth()->user()->full_name ?? auth()->user()->email ?? 'Administrator';
+            StudentHistory::create([
+                'student_id' => $student->id,
+                'action'     => 'Record Deleted',
+                'details'    => 'Student record removed by ' . $deleter,
+            ]);
+            $student->user->delete();
+            $student->delete();
+            return redirect()->route('students.index')->with('success', 'Student record deleted.');
+        });
     }
 
     // ── Staff Show ────────────────────────────────────────────────────────────
@@ -284,28 +294,32 @@ class StudentStaffController extends Controller
             'attendance_status' => 'required|in:present,absent,on_leave',
         ]);
 
-        $staff->user->update([
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'email'      => $request->email,
-            'phone'      => $request->phone,
-        ]);
+        return DB::transaction(function () use ($request, $staff) {
+            $staff->user->update([
+                'first_name' => $request->first_name,
+                'last_name'  => $request->last_name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+            ]);
 
-        $staff->update([
-            'position_id'       => $request->position_id,
-            'department_id'     => $request->department_id,
-            'employment_status' => $request->employment_status,
-            'attendance_status' => $request->attendance_status,
-        ]);
+            $staff->update([
+                'position_id'       => $request->position_id,
+                'department_id'     => $request->department_id,
+                'employment_status' => $request->employment_status,
+                'attendance_status' => $request->attendance_status,
+            ]);
 
-        return redirect()->route('staff.show', $staff->id)->with('success', 'Staff record updated successfully.');
+            return redirect()->route('staff.show', $staff->id)->with('success', 'Staff record updated successfully.');
+        });
     }
 
     // ── Staff Destroy ─────────────────────────────────────────────────────────
     public function destroyStaff(Staff $staff)
     {
-        $staff->user->delete();
-        $staff->delete();
-        return redirect()->route('staff.index')->with('success', 'Staff record deleted.');
+        return DB::transaction(function () use ($staff) {
+            $staff->user->delete();
+            $staff->delete();
+            return redirect()->route('staff.index')->with('success', 'Staff record deleted.');
+        });
     }
 }

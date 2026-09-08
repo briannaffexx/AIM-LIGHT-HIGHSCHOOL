@@ -18,15 +18,16 @@ class AcademicController extends Controller
 {
     public function teacherSubjects()
     {
-        $staff = Auth::user()->staff;
+        $user = Auth::user();
+        $staff = $user->staff;
 
-        if (!$staff) {
-            return redirect()->back()->with('error', 'Staff record not found.');
+        if ($staff && ($user->hasRole('teacher') || $staff->teacherSubjects()->exists())) {
+            $subjects = $staff->teacherSubjects()
+                ->with(['subject', 'schoolClass', 'assessments'])
+                ->get();
+        } else {
+            $subjects = TeacherSubject::with(['subject', 'schoolClass', 'staff.user', 'assessments'])->get();
         }
-
-        $subjects = $staff->teacherSubjects()
-            ->with(['subject', 'schoolClass'])
-            ->get();
 
         return view('academics.teacher_subjects', compact('subjects'));
     }
@@ -38,7 +39,7 @@ class AcademicController extends Controller
 
         $staff = Auth::user()->staff;
 
-        if (!$staff || ($staff->id !== $teacherSubject->staff_id && !Auth::user()->hasRole('admin'))) {
+        if (!$staff || ($staff->id !== $teacherSubject->staff_id && !Auth::user()->hasAnyRole(['admin', 'head-teacher']))) {
             abort(403, 'Unauthorized');
         }
 
@@ -46,7 +47,7 @@ class AcademicController extends Controller
             ->with('term')
             ->get();
 
-        $terms = Term::all();
+        $terms = Term::with('academicYear')->get();
 
         return view('academics.assessments', compact('teacherSubject', 'assessments', 'terms'));
     }
@@ -57,7 +58,7 @@ class AcademicController extends Controller
 
         $staff = Auth::user()->staff;
 
-        if (!$staff || ($staff->id !== $teacherSubject->staff_id && !Auth::user()->hasRole('admin'))) {
+        if (!$staff || ($staff->id !== $teacherSubject->staff_id && !Auth::user()->hasAnyRole(['admin', 'head-teacher']))) {
             abort(403, 'Unauthorized');
         }
 
@@ -86,7 +87,7 @@ class AcademicController extends Controller
 
         $staff = Auth::user()->staff;
 
-        if (!$staff || ($staff->id !== $assessment->teacherSubject->staff_id && !Auth::user()->hasRole('admin'))) {
+        if (!$staff || ($staff->id !== $assessment->teacherSubject->staff_id && !Auth::user()->hasAnyRole(['admin', 'head-teacher']))) {
             abort(403, 'Unauthorized');
         }
 
@@ -105,7 +106,7 @@ class AcademicController extends Controller
 
         $staff = Auth::user()->staff;
 
-        if (!$staff || ($staff->id !== $assessment->teacherSubject->staff_id && !Auth::user()->hasRole('admin'))) {
+        if (!$staff || ($staff->id !== $assessment->teacherSubject->staff_id && !Auth::user()->hasAnyRole(['admin', 'head-teacher']))) {
             abort(403, 'Unauthorized');
         }
 
@@ -154,7 +155,7 @@ class AcademicController extends Controller
 
         $staff = Auth::user()->staff;
 
-        if (!Auth::user()->hasRole('admin')) {
+        if (!Auth::user()->hasAnyRole(['admin', 'head-teacher'])) {
             if (!$staff) {
                 abort(403, 'Unauthorized');
             }
@@ -221,7 +222,7 @@ class AcademicController extends Controller
 
                 foreach ($assessments as $ass) {
                     $result = $allResults->get($ass->id);
-                    if ($result) {
+                    if ($result && $ass->max_marks > 0) {
                         $percentage = ($result->marks_obtained / $ass->max_marks) * 100;
                         $totalWeightedScore += $percentage * ($ass->weight / 100);
                         $totalWeight += $ass->weight;

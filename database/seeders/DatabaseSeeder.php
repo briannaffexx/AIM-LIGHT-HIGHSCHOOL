@@ -45,6 +45,9 @@ class DatabaseSeeder extends Seeder
 
             // Meal schedules
             MealSchedulesSeeder::class,
+
+            // Day School integration (library, inventory, discipline, timetable, announcements, parents)
+            DaySchoolModulesSeeder::class,
         ]);
     }
 }

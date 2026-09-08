@@ -6,6 +6,17 @@
 @endsection
 
 @section('content')
+    <div style="margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <a href="{{ route('finance.accounts') }}" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Fee Accounts</span>
+        </a>
+        <a href="{{ route('students.show', $student->id) }}" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Student Profile</span>
+        </a>
+    </div>
+
     <div class="dashboard-row" style="grid-template-columns: 2fr 1fr;">
         
         <!-- Invoices List & Record Payment -->
@@ -38,8 +49,8 @@
                                         <small style="color: var(--text-secondary);">Issued: {{ $inv->created_at->format('Y-m-d') }}</small>
                                     </td>
                                     <td>{{ $inv->term->name }}</td>
-                                    <td style="text-align: right; font-weight: 600;">{{ number_format($inv->amount_due, 2) }}</td>
-                                    <td style="text-align: right; color: var(--success-color);">{{ number_format($paid, 2) }}</td>
+                                    <td style="text-align: right; font-weight: 600;">MWK {{ number_format($inv->amount_due, 2) }}</td>
+                                    <td style="text-align: right; color: var(--success-color);">MWK {{ number_format($paid, 2) }}</td>
                                     <td style="text-align: center;">
                                         <span class="pill @if($inv->status == 'paid') pill-success @elseif($inv->status == 'partially_paid') pill-warning @else pill-danger @endif">
                                             {{ str_replace('_', ' ', $inv->status) }}
@@ -47,11 +58,12 @@
                                     </td>
                                     <td style="text-align: right;">
                                         @if($inv->status !== 'paid')
-                                            <button onclick="document.getElementById('pay_invoice_id').value = '{{ $inv->id }}'; document.getElementById('pay_amount').value = '{{ $bal }}'; document.getElementById('pay_amount').focus();" class="btn btn-primary" style="padding: 0.3rem 0.60rem; font-size: 0.7rem;">
-                                                Pay
+                                            <button onclick="document.getElementById('pay_invoice_id').value = '{{ $inv->id }}'; document.getElementById('pay_amount').value = '{{ $bal }}'; document.getElementById('pay_amount').focus();" class="btn btn-primary btn-sm">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                                <span>Pay</span>
                                             </button>
                                         @else
-                                            <span style="font-size: 0.75rem; color: var(--success-color); font-weight: 600;">Paid</span>
+                                            <span style="font-size: 0.75rem; color: var(--success-color); font-weight: 600;">✓ Settled</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -141,7 +153,10 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--success-color); border-color: rgba(16, 185, 129, 0.3);">Submit Payment</button>
+                    <button type="submit" class="btn btn-success" style="width: 100%;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>Submit Payment</span>
+                    </button>
                 </form>
             </div>
 
@@ -171,7 +186,10 @@
                         <input type="number" step="0.01" name="amount_due" id="amount_due" class="form-control" placeholder="0.00" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Invoice</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>Create Invoice</span>
+                    </button>
                 </form>
             </div>
 

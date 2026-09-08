@@ -4,23 +4,21 @@
 @section('page_title', 'Internal Audit Control Panel')
 
 @section('content')
-    <div class="card-grid">
-        <div class="glass-card">
+    <div class="dashboard-row" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:1.75rem;">
+        <div class="metric-card" style="border-left:4px solid #6366f1;">
             <div class="metric-title">Fee Invoiced</div>
-            <div class="metric-value">{{ number_format($total_invoiced, 2) }}</div>
-            <div class="metric-indicator text-secondary">Total student bills</div>
+            <div class="metric-value" style="font-size:1.5rem;">{{ number_format($total_invoiced, 0) }}</div>
+            <div class="metric-sub">MWK · Total student bills</div>
         </div>
-
-        <div class="glass-card">
-            <div class="metric-title">Total Cash Collected</div>
-            <div class="metric-value">{{ number_format($total_collected, 2) }}</div>
-            <div class="metric-indicator text-secondary">Registered payment receipts</div>
+        <div class="metric-card" style="border-left:4px solid #10b981;">
+            <div class="metric-title">Cash Collected</div>
+            <div class="metric-value" style="font-size:1.5rem;color:var(--success-color);">{{ number_format($total_collected, 0) }}</div>
+            <div class="metric-sub">MWK · Payment receipts</div>
         </div>
-
-        <div class="glass-card">
+        <div class="metric-card" style="border-left:4px solid #ef4444;">
             <div class="metric-title">Expenses Logged</div>
-            <div class="metric-value">{{ number_format($total_expenses, 2) }}</div>
-            <div class="metric-indicator text-secondary">Registered payout receipts</div>
+            <div class="metric-value" style="font-size:1.5rem;">{{ number_format($total_expenses, 0) }}</div>
+            <div class="metric-sub">MWK · Payout receipts</div>
         </div>
     </div>
 
