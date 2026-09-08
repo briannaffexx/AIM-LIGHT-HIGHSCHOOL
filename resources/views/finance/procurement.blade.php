@@ -36,24 +36,21 @@
                                 <td>
                                     @if($req->status === 'approved' && in_array(Auth::user()->role->slug, ['procurement-officer', 'admin']))
                                         <!-- Quick trigger PO form -->
-                                        <button onclick="document.getElementById('po_req_id').value = '{{ $req->id }}'; document.getElementById('po_item_desc').innerText = '{{ $req->item_name }} (x{{ $req->quantity }})'; document.getElementById('po_total').value = '{{ $req->estimated_cost }}'; document.getElementById('supplier_id').focus();" class="btn btn-primary btn-sm">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                                            <span>Generate PO</span>
+                                        <button onclick="document.getElementById('po_req_id').value = '{{ $req->id }}'; document.getElementById('po_item_desc').innerText = '{{ $req->item_name }} (x{{ $req->quantity }})'; document.getElementById('po_total').value = '{{ $req->estimated_cost }}'; document.getElementById('supplier_id').focus();" class="btn btn-primary btn-icon-sm" title="Generate Purchase Order">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                                         </button>
                                     @elseif($req->status === 'pending' && in_array(Auth::user()->role->slug, ['head-teacher', 'admin']))
-                                        <div class="btn-group">
+                                        <div class="btn-group" style="gap:0.3rem;">
                                             <form action="{{ route('finance.procurement.request.approve', $req->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-primary btn-sm" title="Approve Request">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                                    <span>Approve</span>
+                                                <button type="submit" class="btn btn-primary btn-icon-sm" title="Approve Request">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                                 </button>
                                             </form>
                                             <form action="{{ route('finance.procurement.request.reject', $req->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.25);" title="Reject Request">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                                    <span>Reject</span>
+                                                <button type="submit" class="btn btn-secondary btn-icon-sm" style="color: var(--danger-color); border-color: rgba(239, 68, 68, 0.25);" title="Reject Request">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                                 </button>
                                             </form>
                                         </div>

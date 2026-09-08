@@ -60,9 +60,8 @@
                                     <option value="damaged"         {{ $item->status=='damaged'?'selected':'' }}>Damaged</option>
                                     <option value="need_replacement"{{ $item->status=='need_replacement'?'selected':'' }}>Need Repl.</option>
                                 </select>
-                                <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.5rem; font-size:0.72rem;">
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                                    <span>Update</span>
+                                <button type="submit" class="btn btn-secondary btn-icon-sm" title="Update Status">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                                 </button>
                             </form>
                         </td>

@@ -33,7 +33,9 @@
                 @can('role:admin,head-teacher,teacher')
                 <form action="{{ route('communication.announcements.destroy', $ann->id) }}" method="POST">
                     @csrf @method('DELETE')
-                    <button type="submit" style="background:none; border:none; cursor:pointer; color:var(--danger-color); font-size:0.8rem;">Remove</button>
+                    <button type="submit" class="btn btn-secondary btn-icon-sm" style="color:var(--danger-color); border-color:rgba(239,68,68,0.25);" title="Delete Announcement">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
                 </form>
                 @endcan
             </div>

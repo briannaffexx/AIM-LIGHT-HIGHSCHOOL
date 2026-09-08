@@ -58,9 +58,8 @@
                                     </td>
                                     <td style="text-align: right;">
                                         @if($inv->status !== 'paid')
-                                            <button onclick="document.getElementById('pay_invoice_id').value = '{{ $inv->id }}'; document.getElementById('pay_amount').value = '{{ $bal }}'; document.getElementById('pay_amount').focus();" class="btn btn-primary btn-sm">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                                                <span>Pay</span>
+                                            <button onclick="document.getElementById('pay_invoice_id').value = '{{ $inv->id }}'; document.getElementById('pay_amount').value = '{{ $bal }}'; document.getElementById('pay_amount').focus();" class="btn btn-primary btn-icon-sm" title="Record Payment (Balance: MWK {{ number_format($bal, 2) }})">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                                             </button>
                                         @else
                                             <span style="font-size: 0.75rem; color: var(--success-color); font-weight: 600;">✓ Settled</span>

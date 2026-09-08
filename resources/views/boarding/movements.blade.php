@@ -44,29 +44,26 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="btn-group">
+                                    <div class="btn-group" style="gap:0.3rem;">
                                         @if($mvt->status == 'pending')
                                             <form action="{{ route('boarding.movements.approve', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-primary btn-sm" title="Approve Leave">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                                    <span>Approve</span>
+                                                <button type="submit" class="btn btn-primary btn-icon-sm" title="Approve Leave">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                                 </button>
                                             </form>
                                         @elseif($mvt->status == 'approved')
                                             <form action="{{ route('boarding.movements.depart', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--info-color); border-color: rgba(6, 182, 212, 0.3);" title="Mark Departed">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                                                    <span>Depart</span>
+                                                <button type="submit" class="btn btn-secondary btn-icon-sm" style="color: var(--info-color); border-color: rgba(6, 182, 212, 0.3);" title="Mark Departed">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                                 </button>
                                             </form>
                                         @elseif($mvt->status == 'departed')
                                             <form action="{{ route('boarding.movements.return', $mvt->id) }}" method="POST" style="display:inline;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--success-color); border-color: rgba(16, 185, 129, 0.3);" title="Mark Returned">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                                                    <span>Return</span>
+                                                <button type="submit" class="btn btn-secondary btn-icon-sm" style="color: var(--success-color); border-color: rgba(16, 185, 129, 0.3);" title="Mark Returned">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                                                 </button>
                                             </form>
                                         @endif

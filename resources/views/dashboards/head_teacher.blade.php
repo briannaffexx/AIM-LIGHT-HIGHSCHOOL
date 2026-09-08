@@ -182,19 +182,17 @@
                             <td>{{ $req->requester->first_name ?? $req->requester->name ?? 'Staff' }}</td>
                             <td style="text-align:right; font-weight:700;">MWK {{ number_format($req->estimated_cost, 2) }}</td>
                             <td style="text-align:right;">
-                                <div class="btn-group" style="justify-content:flex-end;">
+                                <div class="btn-group" style="justify-content:flex-end; gap:0.3rem;">
                                     <form action="{{ route('finance.procurement.request.approve', $req->id) }}" method="POST" style="display:inline;">
                                         @csrf
-                                        <button type="submit" class="btn btn-primary btn-sm" title="Approve Request">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                            <span>Approve</span>
+                                        <button type="submit" class="btn btn-primary btn-icon-sm" title="Approve Request">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                         </button>
                                     </form>
                                     <form action="{{ route('finance.procurement.request.reject', $req->id) }}" method="POST" style="display:inline;">
                                         @csrf
-                                        <button type="submit" class="btn btn-secondary btn-sm" style="color:var(--danger-color); border-color:rgba(239,68,68,0.25);" title="Reject Request">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                            <span>Reject</span>
+                                        <button type="submit" class="btn btn-secondary btn-icon-sm" style="color:var(--danger-color); border-color:rgba(239,68,68,0.25);" title="Reject Request">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </form>
                                 </div>
@@ -253,14 +251,12 @@
                                 </span>
                             </td>
                             <td style="text-align:right;">
-                                <div class="btn-group" style="justify-content:flex-end;">
-                                    <a href="{{ route('students.show', $st->id) }}" class="btn btn-secondary btn-sm" title="View Profile">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        <span>Profile</span>
+                                <div class="btn-group" style="justify-content:flex-end; gap:0.3rem;">
+                                    <a href="{{ route('students.show', $st->id) }}" class="btn btn-secondary btn-icon-sm" title="View Profile">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                     </a>
-                                    <a href="{{ route('academics.report-card', $st->id) }}" class="btn btn-secondary btn-sm" title="Report Card">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                        <span>Report</span>
+                                    <a href="{{ route('academics.report-card', $st->id) }}" class="btn btn-secondary btn-icon-sm" title="Academic Report Card">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                     </a>
                                 </div>
                             </td>
